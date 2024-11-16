@@ -38,24 +38,11 @@ This model predicts and analyzes Amazon's technical talent needs, feasible hirin
   - scikit-learn
 
 ## Project Structure
-amazon-recruiting-model/
-├── calculator/
-│   ├── total_hire_target_calculator.py     # Total hiring target calculations
-│   ├── feasible_to_hire_calculator.py      # Feasibility calculations
-│   └── retention_calculator.py             # Retention analysis
-├── parameters/
-│   ├── sector_assumption.py                # Sector growth assumptions
-│   └── age_group_assumption.py             # Age group assumptions
-├── notebook/
-│   ├── total_hire_target.ipynb            # Hiring target analysis
-│   ├── feasible_to_hire.ipynb             # Hiring feasibility analysis
-│   └── annual_tech_hire_gap.ipynb         # Talent gap analysis
-├── result/
-│   ├── annual_tech_hire_gap.ipynb         # Gap analysis results
-│   └── retention_analysis.ipynb           # Retention analysis results
-├── data/
-│   └── bls_unemployment_by_age_group.csv   # Unemployment rate data
-└── requirements.txt
+- **calculators/**: Contains Python scripts for calculations like total hiring targets and retention analysis.
+- **parameters/**: Assumptions such as sector growth and age group assumptions.
+- **analysis/**: Jupyter notebooks with detailed analysis and visualizations.
+- **data/**: Raw data used in the analysis.
+- **result/**: Output and processed results.
 
 ## Key Model Assumptions
 
