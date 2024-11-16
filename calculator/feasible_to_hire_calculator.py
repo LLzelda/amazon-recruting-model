@@ -1,83 +1,8 @@
 import pandas as pd
 import numpy as np
-import os
 from sklearn.linear_model import LinearRegression
-
-# Channel population data
-channel_population = {
-    'Industry': {
-        'total_pool': 1_000_000,  # Domestic workforce in relevant industry
-        'distribution': {
-            '16 to 19 years': 0.00,  # Almost none
-            '20 to 24 years': 0.10,  # 10% of industry workforce
-            '25 to 34 years': 0.35,  # 35% of industry workforce
-            '35 to 44 years': 0.30,  # 30% of industry workforce
-            '45 to 54 years': 0.15,  # 15% of industry workforce
-            '55 years and over': 0.10  # 10% of industry workforce
-        }
-    },
-    'Student': {
-        'total_pool': 200_000,  # Annual graduates in relevant fields
-        'distribution': {
-            '16 to 19 years': 0.05,  # High school/early college
-            '20 to 24 years': 0.60,  # Bachelor's graduates
-            '25 to 34 years': 0.30,  # Master's/PhD students
-            '35 to 44 years': 0.04,  # Career changers
-            '45 to 54 years': 0.007,  # Rare cases
-            '55 years and over': 0.003  # Very rare cases
-        }
-    },
-    'International': {
-        'total_pool': 500_000,  # Potential international candidates
-        'distribution': {
-            '16 to 19 years': 0.02,  # International students
-            '20 to 24 years': 0.25,  # Fresh graduates
-            '25 to 34 years': 0.40,  # Early career
-            '35 to 44 years': 0.20,  # Mid career
-            '45 to 54 years': 0.10,  # Senior level
-            '55 years and over': 0.03  # Expert level
-        }
-    }
-}
-
-# Hiring channels qualification rates
-hiring_channels = {
-    'Industry': {
-        '16 to 19 years': {'qualified_rate': 0.0},
-        '20 to 24 years': {'qualified_rate': 0.15},
-        '25 to 34 years': {'qualified_rate': 0.45},
-        '35 to 44 years': {'qualified_rate': 0.60},
-        '45 to 54 years': {'qualified_rate': 0.55},
-        '55 years and over': {'qualified_rate': 0.40}
-    },
-    'Student': {
-        '16 to 19 years': {'qualified_rate': 0.10},
-        '20 to 24 years': {'qualified_rate': 0.35},
-        '25 to 34 years': {'qualified_rate': 0.25},
-        '35 to 44 years': {'qualified_rate': 0.05},
-        '45 to 54 years': {'qualified_rate': 0.02},
-        '55 years and over': {'qualified_rate': 0.01}
-    },
-    'International': {
-        '16 to 19 years': {'qualified_rate': 0.05},
-        '20 to 24 years': {'qualified_rate': 0.30},
-        '25 to 34 years': {'qualified_rate': 0.50},
-        '35 to 44 years': {'qualified_rate': 0.45},
-        '45 to 54 years': {'qualified_rate': 0.35},
-        '55 years and over': {'qualified_rate': 0.20}
-    }
-}
-
-# Age group mapping
-age_group_mapping = {
-    '16 to 19 years': '16-19',
-    '20 to 24 years': '20-24',
-    '25 to 34 years': '25-34',
-    '35 to 44 years': '35-44',
-    '45 to 54 years': '45-54',
-    '55 years and over': '55+'
-}
-
+from parameters.age_group_assumption import age_group_mapping
+from parameters.channel_assumption import hiring_channels, channel_population
 def predict_unemployment_rates(historical_data):
     """
     Predict unemployment rates for each age group
@@ -142,19 +67,24 @@ def predict_unemployment_rates(historical_data):
 
 def get_feasible_hires_by_year(channel_population, hiring_channels, predictions_by_age, age_group_mapping):
     """
-    Calculate feasible hires for each year from 2024 to 2033
+    Calculate feasible hires considering both unemployed and employed job seekers
     
     Parameters:
-    channel_population: dict, population data by channel
-    hiring_channels: dict, qualification rates by channel and age group
-    predictions_by_age: dict, unemployment rate predictions by age group
-    age_group_mapping: dict, mapping between age group formats
-    
-    Returns:
-    DataFrame with columns: Year, Feasible_Hires
+    -----------
+    channel_population: dict
+        Population data by channel
+    hiring_channels: dict
+        Qualification rates by channel
+    predictions_by_age: dict
+        Predicted unemployment rates by age group
+    age_group_mapping: dict
+        Mapping between channel age groups and prediction age groups
     """
     years = range(2024, 2034)
     feasible_hires = pd.DataFrame(index=years, columns=['Feasible_Hires'])
+    
+    # Job seeking rates by employment status
+    employed_job_seeking_rate = 0.15  # 15% of employed people seek jobs annually
     
     for year in years:
         total_feasible = 0
@@ -164,14 +94,22 @@ def get_feasible_hires_by_year(channel_population, hiring_channels, predictions_
                 mapped_age_group = age_group_mapping[age_group]
                 
                 if mapped_age_group in predictions_by_age:
-                    pred_rate = predictions_by_age[mapped_age_group].loc[
+                    # Get unemployment rate for this age group and year
+                    unemployment_rate = predictions_by_age[mapped_age_group].loc[
                         predictions_by_age[mapped_age_group]['Date'].dt.year == year, 
                         'Predicted_Rate'
                     ].iloc[0] / 100
                     
+                    # Calculate total job seekers
+                    unemployed_seekers = base_pool * unemployment_rate
+                    employed_seekers = base_pool * (1 - unemployment_rate) * employed_job_seeking_rate
+                    total_seekers = unemployed_seekers + employed_seekers
+                    
+                    # Apply qualification rate
                     qualified_rate = hiring_channels[channel][age_group]['qualified_rate']
-                    feasible_hires.loc[year, 'Feasible_Hires'] = base_pool * pred_rate * qualified_rate
-                    total_feasible += feasible_hires.loc[year, 'Feasible_Hires']
+                    feasible_hires_channel = total_seekers * qualified_rate
+                    
+                    total_feasible += feasible_hires_channel
         
         feasible_hires.loc[year, 'Feasible_Hires'] = total_feasible
     
