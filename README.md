@@ -38,7 +38,6 @@ This model predicts and analyzes Amazon's technical talent needs, feasible hirin
   - scikit-learn
 
 ## Project Structure
-
 amazon-recruiting-model/
 ├── calculator/
 │   ├── total_hire_target_calculator.py     # Total hiring target calculations
