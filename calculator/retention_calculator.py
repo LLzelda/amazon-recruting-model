@@ -16,6 +16,9 @@ from parameters.retention_assumption import (
     RETAINABLE_RATE
 )
 
+##Nov.21 update##
+from parameters.year_assumption import attrition_rates_by_year #dynamic yearly attrition rates (2023-2033)
+
 def calculate_detailed_attrition(scenario='median'):
     # Get employee projections using existing function
     projections_df = calculate_projections()
@@ -64,6 +67,47 @@ def calculate_detailed_attrition(scenario='median'):
     ).round(0)
     
     return results
+
+
+
+##Nov.21 update##
+def calculate_detailed_attrition_with_yearly_rates(scenario='median'):
+    projections_df = calculate_projections()
+    results = pd.DataFrame()
+    results['Year'] = projections_df['Year']
+    results['Total_Tech_Employees'] = projections_df[f'tech_total_{scenario}']
+    
+
+    for age_group in workforce_by_age_group.keys():
+        workforce_percent = workforce_by_age_group[age_group]
+        employees_in_group = results['Total_Tech_Employees'] * workforce_percent
+        results[f'Employees_{age_group}'] = employees_in_group.round(0)
+        results[f'Attrition_{age_group}'] = results.apply(
+            lambda row: row[f'Employees_{age_group}'] * attrition_rates_by_year[row['Year']],
+            axis=1
+        ).round(0)
+        
+        total_comp = compensation_by_age_group[age_group]
+        retention_cost = employees_in_group * total_comp * RETENTION_COST_RATE
+        results[f'Retention_Cost_{age_group}'] = retention_cost.round(0)
+    
+
+    attrition_columns = [col for col in results.columns if col.startswith('Attrition_')]
+    results['Total_Attrition'] = results[attrition_columns].sum(axis=1).round(0)
+    
+    results['Overall_Attrition_Rate'] = (
+        results['Total_Attrition'] / results['Total_Tech_Employees']
+    ).round(4)
+
+    retention_cost_columns = [col for col in results.columns if col.startswith('Retention_Cost_')]
+    results['Total_Retention_Cost'] = results[retention_cost_columns].sum(axis=1).round(0)
+    
+    results['Average_Retention_Cost_Per_Employee'] = (
+        results['Total_Retention_Cost'] / results['Total_Tech_Employees']
+    ).round(0)
+    
+    return results
+
 
 
 def analyze_retention_worth():
