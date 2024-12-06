@@ -85,3 +85,30 @@ def get_annual_hiring_needs(df, scenario='median'):
     hiring_needs['Total_Hires'] = hiring_needs['New_Hires_Growth'] + hiring_needs['Replacement_Hires']
     
     return hiring_needs
+
+######Attirtion##########
+def calculate_weekly_hiring(attrition, weekly_percentages):
+    data = []
+    for year_index, year_attrition in enumerate(attrition):
+        weekly_hiring = year_attrition * weekly_percentages
+        for week, hiring_need in enumerate(weekly_hiring, start=1):
+            data.append({"Year": 2024 + year_index, "Week": week, "Hiring Need": hiring_need})
+    return pd.DataFrame(data)
+########################
+###By Target Hires######
+def calculate_weekly_hiring_gap(hiring_gap, weekly_percentages):
+    weekly_data = []
+    for year, row in hiring_gap.iterrows():
+        weekly_net_target = row['Net_Target_Hires'] * weekly_percentages
+        weekly_feasible = row['Feasible_Hires'] * weekly_percentages
+        weekly_gap = weekly_feasible - weekly_net_target
+        for week, (net, feasible, gap) in enumerate(zip(weekly_net_target, weekly_feasible, weekly_gap), start=1):
+            weekly_data.append({
+                "Year": year,
+                "Week": week,
+                "Net_Target_Hires": net,
+                "Feasible_Hires": feasible,
+                "Weekly_Gap": gap
+            })
+    return pd.DataFrame(weekly_data)
+#########################
