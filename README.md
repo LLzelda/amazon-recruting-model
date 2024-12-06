@@ -56,6 +56,7 @@ $$
 $$
 Loss_{age \ group,year} = Attrition_{age \ group,year} × (P_{age \ group,year} + H_{age \ group,year} + P_{age \ group,year} × \frac{T_m}{12})
 $$
+
 Where:
 - $P_{age}$ = Productivity value for age group
 - $A_{age}$ = Attrition rate for age group
@@ -66,6 +67,7 @@ Where:
 $$
 ROI_{age} = \frac{Loss_{age} - (C_{age} × R_r)}{C_{age} × R_r}
 $$
+
 Where:
 - $C_{age}$ = Total compensation for age group
 - $R_r$ = Retention cost rate
