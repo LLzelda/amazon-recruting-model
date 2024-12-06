@@ -5,9 +5,9 @@ This model predicts and analyzes Amazon's technical talent needs, feasible hirin
 
 - Growth projections across business sectors (Amazon US, International, AWS)
 - Evolution of technical talent ratios
-- Productivity contributions by age groups
-- Attrition and retention analysis
-- Feasibility assessment of hiring channels
+- Age-based productivity and attrition analysis
+- Retention ROI optimization
+- Multi-channel hiring feasibility assessment
 
 ## Key Findings
 
@@ -19,15 +19,61 @@ This model predicts and analyzes Amazon's technical talent needs, feasible hirin
   - AWS: 533,690
   - Total: 1,256,328
 
-### Annual Hiring Needs (Base Case)
-- 2024: 102,426
-- 2028: 149,859
-- 2033: 239,126
+### Annual Hiring Needs (including attrition)
+- 2024: 155,307 
+- 2028: 212,693
+- 2033: 310,109
 
 ### Talent Gap Analysis
-- Talent gaps expected to emerge from 2029
-- Gap widens to 224,480 by 2033
-- 10-year cumulative gap: 931,775
+- Talent gaps emerge from 2025
+- Gap widens to 177,368 by 2033
+- 10-year cumulative gap: 756,300
+- Total economic impact: $3.1B (Net Cost)
+
+## Calculation Formulas
+
+#### 1. Technical Workforce Projection
+$$
+Tech \ Employees_{year} = Tech \ Employees_{year-1} * (1 + Growth \ Rate) 
+$$
+
+#### 2. Net Hiring Target
+$$
+Net \ Target \ Hires = Base \ Target \ Hires + Attrition - Retainable
+$$
+
+#### 3. Hiring Feasibility
+$$
+Feasible \ Hires = Σ(Candidate \ Pool_{channel} * Qualification \ Rate_{channel})
+$$
+
+#### 4. Detailed Attrition
+$$
+Attrition_{age \ group,year} = Employees_{age \ group,year} × Attrition\ Rate_{age \ group,year}
+$$
+
+#### 5. Total Potential Loss
+$$
+Loss_{age \ group,year} = Attrition_{age \ group,year} × (P_{age \ group,year} + H_{age \ group,year} + P_{age \ group,year} × \frac{T_m}{12})
+$$
+Where:
+- $P_{age}$ = Productivity value for age group
+- $A_{age}$ = Attrition rate for age group
+- $H_{age}$ = Hiring cost (Compensation × Hiring cost rate)
+- $T_m$ = Training months
+
+#### 6. Retention ROI by Age Group
+$$
+ROI_{age} = \frac{Loss_{age} - (C_{age} × R_r)}{C_{age} × R_r}
+$$
+Where:
+- $C_{age}$ = Total compensation for age group
+- $R_r$ = Retention cost rate
+
+#### 8. Retainable Employees
+$$
+Retainable_{age} = Attrition_{age} × Retainable\ Rate
+$$
 
 ## Technical Requirements
 
@@ -65,7 +111,7 @@ This model predicts and analyzes Amazon's technical talent needs, feasible hirin
 - 55+ years: $850,000 (Distinguished level)
 
 ### Retention Analysis
-- Analysis shows highest ROI for retention investments in 25-44 age group
+- Analysis shows highest ROI for retention investments in 16-19 age group and lowest in 55+ age group
 - Expected to recover 50% of potential attrition
 - Average retention cost per employee: $58,470
 
@@ -88,23 +134,21 @@ This model predicts and analyzes Amazon's technical talent needs, feasible hirin
 
 ## Future Development
 
-1. Optimize hiring channel mix strategy
-2. Enhance regional talent supply analysis
-3. Develop retention ROI optimization model
-4. Add compensation competitiveness module
+### Optimization & Improvement
+1. Add hiring channel mix adjustment strategy
+2. Add regional talent supply analysis
+3. Add additional channel to increase hiring feasibility (e.g. bootcamp or apprenticeship.)
+4. Add dynamic retention strategy but not constant conversion rate
+5. Consider age group distribution change over time
+6. Consider salary growth over time
+7. Build for robust assumptions for growth and attrition
+
 
 ## Data Sources
 
 - Amazon Annual Reports
 - Bureau of Labor Statistics (BLS) unemployment data
-- Industry talent mobility studies
-- Internal workforce analytics
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request with detailed description
+- Weekly hiring distribution data provided by Allen
 
 ## License
 

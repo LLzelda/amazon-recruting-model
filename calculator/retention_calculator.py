@@ -107,6 +107,7 @@ def calculate_detailed_attrition_with_yearly_rates(scenario='median'):
     ).round(0)
     
     return results
+
 def analyze_retention_worth():
     """Analyze the retention investment value for each age group"""
     
@@ -141,7 +142,7 @@ def analyze_retention_worth():
 def calculate_retainable_employees(scenario='median'):
     """Calculate the number of employees worth retaining by age group"""
     # Get overall employee projections
-    projections = calculate_detailed_attrition(scenario)
+    projections = calculate_detailed_attrition_with_yearly_rates(scenario)
     
     # Identify which age groups are worth retention efforts
     retention_worth = analyze_retention_worth()
